@@ -427,8 +427,10 @@ public class FayeClient extends WebSocketListener {
     try {
       final byte[] payload = Serialization.toJSON(message);
       webSocket.send(new String(payload));
-    } catch (Exception ignored) {
-
+    } catch (Exception exception) {
+      if (this.errorListener != null) {
+        this.errorListener.onError(exception, null);
+      }
     }
   }
 
