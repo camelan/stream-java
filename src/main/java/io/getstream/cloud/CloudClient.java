@@ -24,6 +24,7 @@ import io.getstream.core.options.RequestOption;
 import io.getstream.core.utils.Serialization;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java8.util.concurrent.CompletableFuture;
@@ -223,6 +224,7 @@ public final class CloudClient {
       FeedID feedId, RealtimeMessageCallback messageCallback, FayeErrorListener errorListener) {
     final CompletableFuture<ChannelSubscription> subscriberCompletion = new CompletableFuture<>();
     try {
+      System.out.println("--- testingLog --- feedSubscriber start");
       checkNotNull(appID, "Missing app id, which is needed in order to subscribe feed");
       final String claim = feedId.getClaim();
       final String notificationChannel = "site" + "-" + appID + "-" + "feed" + "-" + claim;
@@ -245,10 +247,7 @@ public final class CloudClient {
                       }
                     }
                   },
-                  () -> {
-                      errorListener.onError(new Exception("The listener was cancelled."), null);
-                    feedSubscriptions.remove("/" + notificationChannel);
-                  },
+                  () -> feedSubscriptions.remove("/" + notificationChannel),
                           errorListener
                   )
               .get();
@@ -257,6 +256,10 @@ public final class CloudClient {
       feedSubscriptions.put("/" + notificationChannel, subscription);
       subscriberCompletion.complete(channelSubscription);
     } catch (Exception e) {
+      System.out.println("--- testingLog --- feedSubscriber error = " + Arrays.toString(e.getStackTrace()));
+      if (errorListener != null){
+        errorListener.onError(e, null);
+      }
       subscriberCompletion.completeExceptionally(e);
     }
     return subscriberCompletion;

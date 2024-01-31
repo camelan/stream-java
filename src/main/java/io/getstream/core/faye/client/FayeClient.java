@@ -115,6 +115,7 @@ public class FayeClient extends WebSocketListener {
     try {
       messages = Serialization.fromJSONList(text, Message.class);
     } catch (IOException ignored) {
+      System.out.println("--- testingLog --- onMessage error = " + ignored);
     }
 
     if (messages == null) return;
@@ -130,7 +131,9 @@ public class FayeClient extends WebSocketListener {
     closeWebSocket();
     initWebSocket();
 
+    System.out.println("--- testingLog --- onFailure error = " + t);
     if (errorListener != null) {
+      System.out.println("--- testingLog --- errorListener is not null");
       errorListener.onError(t, response);
     }
   }
@@ -158,6 +161,7 @@ public class FayeClient extends WebSocketListener {
           },
           duration);
     } catch (Exception ignored) {
+      System.out.println("--- testingLog --- scheduleTimerTask error = " + ignored);
       // We don't really care if the timer is cancelled, we create a new client anyway.
     }
   }
@@ -247,6 +251,7 @@ public class FayeClient extends WebSocketListener {
             disconnectionCompleter.complete(null);
           } else {
             final FayeClientError error = FayeClientError.parse(response.getError());
+            System.out.println("--- testingLog --- disconnect error = " + error);
             disconnectionCompleter.completeExceptionally(error);
           }
         });
@@ -315,6 +320,7 @@ public class FayeClient extends WebSocketListener {
                   } else {
                     unsubscribeChannel(channel, channelSubscription);
                     final FayeClientError error = FayeClientError.parse(response.getError());
+                    System.out.println("--- testingLog --- subscribe error = " + error);
                     subscriptionCompleter.completeExceptionally(error);
                   }
                 });
@@ -362,6 +368,7 @@ public class FayeClient extends WebSocketListener {
                 } else {
                   final FayeClientError error = FayeClientError.parse(response.getError());
                   publishCompleter.completeExceptionally(error);
+                  System.out.println("--- testingLog --- publish error = " + error);
                 }
               });
         });
@@ -392,6 +399,7 @@ public class FayeClient extends WebSocketListener {
         return true;
       }
     } catch (Exception e) {
+      System.out.println("--- testingLog --- unsubscribeChannel error = " + e);
       e.printStackTrace();
     }
     return false;
@@ -428,6 +436,7 @@ public class FayeClient extends WebSocketListener {
       final byte[] payload = Serialization.toJSON(message);
       webSocket.send(new String(payload));
     } catch (Exception exception) {
+      System.out.println("--- testingLog --- sendMessage error = " + exception);
       if (this.errorListener != null) {
         this.errorListener.onError(exception, null);
       }
