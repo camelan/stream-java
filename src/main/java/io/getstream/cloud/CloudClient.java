@@ -245,7 +245,10 @@ public final class CloudClient {
                       }
                     }
                   },
-                  () -> feedSubscriptions.remove("/" + notificationChannel),
+                  () -> {
+                      errorListener.onError(new Exception("The listener was cancelled."), null);
+                    feedSubscriptions.remove("/" + notificationChannel);
+                  },
                           errorListener
                   )
               .get();
